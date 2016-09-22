@@ -5,7 +5,79 @@ library(tools)
 library(e1071)
 library("SparseM")
 
-source ("../software/helpers/lsdir.R")
+
+
+# workaround for broken list.dirs?? google pointed it out.
+
+lsdir <- function(path, format = "basename", recursive = FALSE, all = FALSE) { 
+  # list directories 
+  # format is any part of "fullpath", "relative", or "basename" 
+
+  # set a path if necessary 
+  if (missing(path)) { 
+    path <- "." 
+  } 
+
+  # recursion 
+  if (recursive == FALSE) { 
+    argRecursive <- "-maxdepth 1" 
+  } else if (recursive) { 
+    argRecursive <- "" 
+  } 
+
+  # piece together system command 
+  execFind <- paste("find", path, argRecursive, 
+    "-mindepth 1", "-type d", "-print", " | sort",  sep = " ") 
+
+  # execute system command 
+  tmp <- system(execFind, intern = TRUE) 
+
+  # remove .hidden files if all == FALSE 
+  if (all == FALSE) { 
+    tmp <- tmp[grep("^\\..*", basename(tmp), invert = TRUE)] 
+  } 
+
+  # match format argument 
+  format <- match.arg(tolower(format), c("fullpath", "relative", "basename")) 
+
+  # format output based upon format argument 
+  if (format == "basename") { 
+    out <- basename(tmp) 
+  } else if (format == "fullpath") { 
+    out <- normalizePath(tmp) 
+  } else { 
+    out <- tmp 
+  } 
+
+  # clean up any duplicate "/" and return 
+  return(gsub("/+", "/", out)) 
+} 
+
+
+
+
+
+
+system3 <- function (binPath, args, verbose = FALSE) 
+{ 
+
+  if (verbose == TRUE) {
+    messagef ("----- Arguments:")
+    messagef ("%s %s", binPath, paste(args, collapse=" "))
+  }
+
+  s = BBmisc::system3(binPath, args, stdout = TRUE)
+  
+  if (verbose == TRUE) {
+    messagef ("----- Output:")
+    messagef ("%s %s", binPath, paste(s$output, collapse="\n"))
+    messagef ("-------------")
+  }
+  
+  return (s)
+}
+
+
 
 
 
@@ -20,7 +92,6 @@ checkFileUniqueness <- function (filename = '')
 {
     # count the number of lines 
     messagef ("  Checking %s for unique data points.", filename)
-    source ("../software/helpers/system3.R")
     s = system3('wc', filename)
     
     output = s$output

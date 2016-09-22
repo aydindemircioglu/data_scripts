@@ -4,7 +4,7 @@ Data often get preprocessed from an original source, and many datasets come in d
 ## Contributing
 Anybody is welcome to contribute. Reach out to anyone from the OpenML team to be added, or simply do a pull request.
 
-## Guidelines:
+## Guidelines
 * Create a folder per dataset name (the name used on OpenML)
 * If necessary, create subfolders for different versions (the version numbers on OpenML)
 * Put a link to the folder in the Wiki description of the dataset on the OpenML website, so that people may find it easily.
